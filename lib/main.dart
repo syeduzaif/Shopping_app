@@ -4,7 +4,6 @@ import 'package:shopping_app/app/app.locator.dart';
 import 'package:shopping_app/app/app.router.dart';
 import 'package:shopping_app/views/home_view.dart';
 import 'package:shopping_app/views/product_view.dart';
-import 'package:shopping_app/app/theme.dart';
 
 void main() {
   setupLocator(); // Initialize the locator
@@ -19,14 +18,16 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  ThemeMode _themeMode = ThemeMode.system;
-  int _selectedIndex = 0; // for selected tab
+  ThemeMode _themeMode = ThemeMode.system; // Default to system theme
+  int _selectedIndex = 0; // For selected tab
   final TextEditingController _searchController = TextEditingController();
 
   final List<Widget> _pages = [
-    HomeView(), // Home page
-    ProductView(), // Product page
-    Center(child: Text('Profile')), // Profile page placeholder
+    const HomeView(),
+    const Center(child: Text('Explore')),
+    const ProductView(),
+    const Center(child: Text('Wishlist')),
+    const Center(child: Text('Profile')),
   ];
 
   @override
@@ -45,19 +46,16 @@ class _MyAppState extends State<MyApp> {
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: _themeMode,
-      // Set the theme mode
       home: Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(70),
+
+      appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(70),
           child: AppBar(
             title: Row(
               children: [
                 IconButton(
                   onPressed: () {},
-                  icon: Icon(
-                    Icons.camera_alt,
-                    color: Colors.white,
-                  ),
+                  icon: const Icon(Icons.camera_alt, color: Colors.white),
                 ),
                 Expanded(
                   child: TextField(
@@ -72,6 +70,17 @@ class _MyAppState extends State<MyApp> {
                     ),
                   ),
                 ),
+                IconButton(
+                  icon: Icon(
+                    _themeMode == ThemeMode.dark ? Icons.brightness_7 : Icons.brightness_2,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _themeMode = _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+                    });
+                  },
+                ),
               ],
             ),
             flexibleSpace: Container(
@@ -83,45 +92,98 @@ class _MyAppState extends State<MyApp> {
                 ),
               ),
             ),
-            backgroundColor: Colors.transparent, // Make AppBar transparent
-            elevation: 0, // Remove shadow
+            backgroundColor: Colors.transparent,
+            elevation: 0,
           ),
         ),
-        body:
-        _pages[_selectedIndex],
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            border: Border(top: BorderSide(width: 2, color: Colors.grey)), // Only top border
-            color: Colors.white,
-          ),
-          child:  BottomNavigationBar(
+        body: Container(
+          // color: Theme.of(context).scaffoldBackgroundColor,
+          child: _pages[_selectedIndex],
+        ),
+        bottomNavigationBar: BottomNavigationBar(
           currentIndex: _selectedIndex,
           onTap: (index) {
             setState(() {
               _selectedIndex = index; // Update selected index
             });
           },
-          selectedItemColor: Theme.of(context).primaryColor,
-          unselectedItemColor: IconTheme.of(context).color,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home, color: IconTheme.of(context).color), // Using icon color from theme
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_bag, color: IconTheme.of(context).color), // Using icon color from theme
-              label: 'Products',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person, color: IconTheme.of(context).color), // Using icon color from theme
-              label: 'Profile',
-            ),
+          selectedItemColor: Theme.of(context).bottomNavigationBarTheme.selectedItemColor,
+          unselectedItemColor: Theme.of(context).bottomNavigationBarTheme.unselectedItemColor,
+          backgroundColor: Theme.of(context).bottomNavigationBarTheme.backgroundColor,
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+            BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Explore'),
+            BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Products'),
+            BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Wishlist'),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
           ],
         ),
-
-      ),
       ),
     );
   }
 }
+
+// Define your themes with BottomNavigationBarThemeData
+final ThemeData lightTheme = ThemeData(
+  scaffoldBackgroundColor: Colors.white,
+  brightness: Brightness.light,
+  primaryColor: Colors.blue,
+  appBarTheme: const AppBarTheme(
+    backgroundColor: Colors.blue,
+    foregroundColor: Colors.white,
+    elevation: 0,
+  ),
+  textTheme: const TextTheme(
+    titleLarge: TextStyle(color: Colors.black),
+    titleMedium: TextStyle(color: Colors.black),
+    titleSmall: TextStyle(color: Colors.grey),
+  ),
+  iconTheme: const IconThemeData(
+    color: Colors.black54,
+  ),
+  bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+    backgroundColor: Colors.white,
+    selectedItemColor: Colors.blue,
+    unselectedItemColor: Colors.black54,
+    showUnselectedLabels: true,
+    selectedLabelStyle: TextStyle(
+      fontWeight: FontWeight.bold,
+    ),
+    unselectedLabelStyle: TextStyle(
+      color: Colors.black54,
+    ),
+    type: BottomNavigationBarType.fixed,
+  ),
+);
+
+final ThemeData darkTheme = ThemeData(
+  scaffoldBackgroundColor: Colors.black, // Changed to Colors.black for solid black
+  brightness: Brightness.dark,
+  primaryColor: Colors.blueGrey,
+  appBarTheme: const AppBarTheme(
+    backgroundColor: Colors.black,
+    foregroundColor: Colors.white,
+    elevation: 0,
+  ),
+  textTheme: const TextTheme(
+    titleLarge: TextStyle(color: Colors.white),
+    titleMedium: TextStyle(color: Colors.white),
+    titleSmall: TextStyle(color: Colors.grey),
+  ),
+  iconTheme: const IconThemeData(
+    color: Colors.white,
+  ),
+  bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+    backgroundColor: Colors.black,
+    selectedItemColor: Colors.white,
+    unselectedItemColor: Colors.grey,
+    showUnselectedLabels: true,
+    selectedLabelStyle: TextStyle(
+      fontWeight: FontWeight.bold,
+    ),
+    unselectedLabelStyle: TextStyle(
+      color: Colors.grey,
+    ),
+    type: BottomNavigationBarType.fixed,
+  ),
+);
